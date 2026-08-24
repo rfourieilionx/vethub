@@ -43,7 +43,7 @@ success_banner() {
 # =============================================================================
 # Backend Server Management
 # =============================================================================
-readonly HEALTH_URL="http://localhost:8080/api/actuator/health"
+readonly HEALTH_URL="http://localhost:8080/api/v1/public/actuator/health"
 readonly BACKEND_TIMEOUT=120
 readonly BACKEND_LOG="/tmp/petclinic-backend.log"
 

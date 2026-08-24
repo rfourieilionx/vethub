@@ -37,3 +37,5 @@ server/**config/*.local.properties
 /server/.settings/
 
 /.opencode/
+.claude/settings.local.json
+/server/openapi.json

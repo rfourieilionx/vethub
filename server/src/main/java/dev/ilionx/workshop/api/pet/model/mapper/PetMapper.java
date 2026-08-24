@@ -23,6 +23,14 @@ public abstract class PetMapper {
         source = "owner.id",
         target = "ownerId"
     )
+    @Mapping(
+        source = "owner.firstName",
+        target = "ownerFirstName"
+    )
+    @Mapping(
+        source = "owner.lastName",
+        target = "ownerLastName"
+    )
     public abstract PetResponse toResponse(Pet pet);
 
     public abstract List<PetResponse> toResponseList(List<Pet> pets);

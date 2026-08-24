@@ -37,6 +37,9 @@ class PetGlobalControllerTest extends IntegrationTest {
     private static final LocalDate PET_BIRTH_DATE = LocalDate.of(2020, 9, 7);
     private static final String UPDATED_PET_NAME = "Max";
 
+    private static final String OWNER_FIRST_NAME = "George";
+    private static final String OWNER_LAST_NAME = "Franklin";
+
     // ========================= LIST =========================
     @Test
     @DisplayName("Should return all pets when pets exist")
@@ -52,7 +55,9 @@ class PetGlobalControllerTest extends IntegrationTest {
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$[0].id", is(equalTo(pet.getId()))))
             .andExpect(jsonPath("$[0].name", is(equalTo(PET_NAME))))
-            .andExpect(jsonPath("$[0].ownerId", is(equalTo(owner.getId()))));
+            .andExpect(jsonPath("$[0].ownerId", is(equalTo(owner.getId()))))
+            .andExpect(jsonPath("$[0].ownerFirstName", is(equalTo(OWNER_FIRST_NAME))))
+            .andExpect(jsonPath("$[0].ownerLastName", is(equalTo(OWNER_LAST_NAME))));
     }
 
     @Test
@@ -85,6 +90,8 @@ class PetGlobalControllerTest extends IntegrationTest {
             .andExpect(jsonPath("$.type.id", is(equalTo(1))))
             .andExpect(jsonPath("$.type.name", is(notNullValue())))
             .andExpect(jsonPath("$.ownerId", is(equalTo(owner.getId()))))
+            .andExpect(jsonPath("$.ownerFirstName", is(equalTo(OWNER_FIRST_NAME))))
+            .andExpect(jsonPath("$.ownerLastName", is(equalTo(OWNER_LAST_NAME))))
             .andExpect(jsonPath("$.visits", is(notNullValue())));
     }
 
