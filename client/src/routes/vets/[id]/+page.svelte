@@ -114,7 +114,9 @@
 								{/each}
 							</div>
 						{:else}
-							<p class="text-foreground">General Practice</p>
+							<Badge variant="secondary" class="text-sm">
+								General Practice
+							</Badge>
 						{/if}
 					</div>
 				</div>

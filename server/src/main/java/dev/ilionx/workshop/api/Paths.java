@@ -56,6 +56,9 @@ public final class Paths {
     public static final String PET_VISITS = OWNER_PET_BY_ID + VISITS_PART;
     public static final String PET_VISIT_BY_ID = PET_VISITS + "/{visitId}";
 
+    // Owner > Visit (roll-up across all of an owner's pets)
+    public static final String OWNER_VISITS = BASE_PATH + "/owners/{ownerId}" + VISITS_PART;
+
     // Visit (global)
     public static final String VISITS = BASE_PATH + VISITS_PART;
     public static final String VISIT_BY_ID = VISITS + ID_PART;

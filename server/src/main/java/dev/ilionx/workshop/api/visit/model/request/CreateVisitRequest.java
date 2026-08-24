@@ -37,4 +37,11 @@ public class CreateVisitRequest {
     )
     private Integer petId;
 
+    @Schema(
+        description = "ID of the vet who attended the visit",
+        example = "1",
+        requiredMode = Schema.RequiredMode.REQUIRED
+    )
+    private Integer vetId;
+
 }

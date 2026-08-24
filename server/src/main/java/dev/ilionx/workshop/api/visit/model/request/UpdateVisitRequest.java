@@ -30,4 +30,12 @@ public class UpdateVisitRequest {
     )
     private String description;
 
+    @Schema(
+        description = "ID of the vet who attended the visit. Optional so an old, un-attributed "
+            + "visit can still be edited without forcing an attending vet to be invented.",
+        example = "1",
+        requiredMode = Schema.RequiredMode.NOT_REQUIRED
+    )
+    private Integer vetId;
+
 }

@@ -8,7 +8,9 @@
 
 <div class="container mx-auto px-4 py-8">
 	<!-- Hero Section with X Mark background -->
-	<section class="relative mb-12 text-center animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-6">
+	<section
+		class="relative mb-12 text-center animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br from-[var(--hero-gradient-from)] to-[var(--hero-gradient-to)] py-12 px-6"
+	>
 		<!-- Decorative X Mark -->
 		<div class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 opacity-[0.03] pointer-events-none">
 			<img src="/x-mark-red.png" alt="" class="h-[400px] w-auto" aria-hidden="true" />

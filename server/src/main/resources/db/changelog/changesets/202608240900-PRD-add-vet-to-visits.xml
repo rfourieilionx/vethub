@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd"
+                   logicalFilePath="202608240900-PRD-add-vet-to-visits.xml">
+
+    <changeSet id="202608240900-PRD-add-vet-to-visits-1" author="claude">
+        <comment>Adding a nullable vet_id foreign key to visits, so a visit can record which vet attended. Nullable because existing visits have no vet, and ON DELETE SET NULL so deleting a vet does not destroy clinical history.</comment>
+        <sql>
+            ALTER TABLE visits ADD COLUMN vet_id INTEGER;
+            ALTER TABLE visits ADD CONSTRAINT fk_visits_vet FOREIGN KEY (vet_id) REFERENCES vets (id) ON DELETE SET NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -20,4 +20,12 @@ public interface PetRepository extends JpaRepository<Pet, Integer> {
      * @return list of pets for the given owner
      */
     List<Pet> findByOwnerId(Integer ownerId);
+
+    /**
+     * Finds all pets whose name contains the given search term, case-insensitively.
+     *
+     * @param name the search term
+     * @return list of pets matching the search term
+     */
+    List<Pet> findByNameContainingIgnoreCase(String name);
 }

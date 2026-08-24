@@ -37,6 +37,9 @@ class PetGlobalControllerTest extends IntegrationTest {
     private static final LocalDate PET_BIRTH_DATE = LocalDate.of(2020, 9, 7);
     private static final String UPDATED_PET_NAME = "Max";
 
+    private static final String OWNER_FIRST_NAME = "George";
+    private static final String OWNER_LAST_NAME = "Franklin";
+
     // ========================= LIST =========================
     @Test
     @DisplayName("Should return all pets when pets exist")
@@ -52,7 +55,9 @@ class PetGlobalControllerTest extends IntegrationTest {
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$[0].id", is(equalTo(pet.getId()))))
             .andExpect(jsonPath("$[0].name", is(equalTo(PET_NAME))))
-            .andExpect(jsonPath("$[0].ownerId", is(equalTo(owner.getId()))));
+            .andExpect(jsonPath("$[0].ownerId", is(equalTo(owner.getId()))))
+            .andExpect(jsonPath("$[0].ownerFirstName", is(equalTo(OWNER_FIRST_NAME))))
+            .andExpect(jsonPath("$[0].ownerLastName", is(equalTo(OWNER_LAST_NAME))));
     }
 
     @Test
@@ -85,6 +90,8 @@ class PetGlobalControllerTest extends IntegrationTest {
             .andExpect(jsonPath("$.type.id", is(equalTo(1))))
             .andExpect(jsonPath("$.type.name", is(notNullValue())))
             .andExpect(jsonPath("$.ownerId", is(equalTo(owner.getId()))))
+            .andExpect(jsonPath("$.ownerFirstName", is(equalTo(OWNER_FIRST_NAME))))
+            .andExpect(jsonPath("$.ownerLastName", is(equalTo(OWNER_LAST_NAME))))
             .andExpect(jsonPath("$.visits", is(notNullValue())));
     }
 
@@ -229,5 +236,67 @@ class PetGlobalControllerTest extends IntegrationTest {
         final String content = response.andReturn().getResponse().getContentAsString();
         final ErrorResponseResource error = fromJson(content, ErrorResponseResource.class);
         assertThat(error.getErrorMessage(), is(equalTo(PET_NOT_FOUND.getReason())));
+    }
+
+    // ========================= SEARCH BY NAME =========================
+    @Test
+    @DisplayName("Should return only pets whose name contains the search term")
+    void shouldReturnOnlyPetsWhoseNameContainsSearchTerm() throws Exception {
+        // Given: Two pets with different names exist
+        final Owner owner = aSavedOwner();
+        aSavedPet(owner, "Buddy");
+        aSavedPet(owner, "Max");
+
+        // When: Searching by a substring of "Buddy" that "Max" does not contain
+        // Then: Should return only the matching pet
+        mockMvc.perform(get(PETS).param("name", "udd"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].name", is(equalTo("Buddy"))));
+    }
+
+    @Test
+    @DisplayName("Should match name search case-insensitively")
+    void shouldMatchNameSearchCaseInsensitively() throws Exception {
+        // Given: Two pets with different names exist
+        final Owner owner = aSavedOwner();
+        aSavedPet(owner, "Buddy");
+        aSavedPet(owner, "Max");
+
+        // When: Searching with a lowercase query
+        // Then: Should still match "Buddy" (and exclude "Max"), proving the filter is case-insensitive
+        mockMvc.perform(get(PETS).param("name", "buddy"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].name", is(equalTo("Buddy"))));
+    }
+
+    @Test
+    @DisplayName("Should return all pets when name parameter is empty")
+    void shouldReturnAllPetsWhenNameParameterIsEmpty() throws Exception {
+        // Given: Two pets exist
+        final Owner owner = aSavedOwner();
+        aSavedPet(owner, "Buddy");
+        aSavedPet(owner, "Max");
+
+        // When: Searching with an empty name parameter
+        // Then: Should return all pets, unfiltered
+        mockMvc.perform(get(PETS).param("name", ""))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    @DisplayName("Should return empty list when no pets match the name search")
+    void shouldReturnEmptyListWhenNoPetsMatchNameSearch() throws Exception {
+        // Given: A pet named "Buddy" exists
+        final Owner owner = aSavedOwner();
+        aSavedPet(owner, "Buddy");
+
+        // When: Searching for a name that does not match any pet
+        // Then: Should return 200 with an empty array, not 404
+        mockMvc.perform(get(PETS).param("name", "Zzzzz"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(0)));
     }
 }

@@ -2,10 +2,13 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { createVisitForPet } from '$lib/api/visit/VisitController';
+	import { getVets } from '$lib/api/vet/VetController';
+	import type { VetResponse } from '$lib/api/models';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Textarea } from '$lib/components/ui/textarea';
+	import * as Select from '$lib/components/ui/select';
 	import { ArrowLeft, Loader2 } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
@@ -14,16 +17,33 @@
 
 	let visitDate = $state(new Date().toISOString().split('T')[0]);
 	let description = $state('');
+	let vets = $state<VetResponse[]>([]);
+	let selectedVetId = $state<number | undefined>(undefined);
 	let submitting = $state(false);
+
+	let selectedVet = $derived(vets.find((v) => v.id === selectedVetId));
+
+	async function loadVets() {
+		try {
+			vets = await getVets();
+		} catch (err) {
+			toast.error('Failed to load vets');
+			console.error('Error loading vets:', err);
+		}
+	}
 
 	async function handleSubmit(e: Event) {
 		e.preventDefault();
+		if (!selectedVetId) {
+			return;
+		}
 		submitting = true;
 
 		try {
 			await createVisitForPet(ownerId, petId, {
 				date: visitDate,
-				description: description.trim()
+				description: description.trim(),
+				vetId: selectedVetId
 			});
 			toast.success('Visit recorded successfully');
 			goto(`/owners/${ownerId}/pets/${petId}`);
@@ -34,6 +54,10 @@
 			submitting = false;
 		}
 	}
+
+	$effect(() => {
+		loadVets();
+	});
 </script>
 
 <svelte:head>
@@ -66,6 +90,26 @@
 			</div>
 
 			<div class="space-y-2">
+				<Label for="vet">Seen by</Label>
+				<Select.Root
+					type="single"
+					value={selectedVetId?.toString()}
+					onValueChange={(value) => (selectedVetId = value ? Number(value) : undefined)}
+				>
+					<Select.Trigger id="vet" class="w-full" disabled={submitting}>
+						{selectedVet ? `Dr. ${selectedVet.firstName} ${selectedVet.lastName}` : 'Select the attending vet'}
+					</Select.Trigger>
+					<Select.Content>
+						{#each vets as vet (vet.id)}
+							<Select.Item value={vet.id.toString()}>
+								Dr. {vet.firstName} {vet.lastName}
+							</Select.Item>
+						{/each}
+					</Select.Content>
+				</Select.Root>
+			</div>
+
+			<div class="space-y-2">
 				<Label for="description">Description</Label>
 				<Textarea
 					id="description"
@@ -86,7 +130,7 @@
 				>
 					Cancel
 				</Button>
-				<Button type="submit" disabled={submitting}>
+				<Button type="submit" disabled={submitting || !selectedVetId}>
 					{#if submitting}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 					{/if}
