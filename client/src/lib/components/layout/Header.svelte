@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { Users, Stethoscope, Calendar, Home, Menu, X, PawPrint } from 'lucide-svelte';
 	import { Button } from '$lib/components/ui/button';
+	import ThemeSwitcher from './ThemeSwitcher.svelte';
 
 	let mobileMenuOpen = $state(false);
 
@@ -49,20 +50,24 @@
 				{/each}
 			</nav>
 
-			<!-- Mobile Menu Button -->
-			<Button
-				variant="ghost"
-				size="icon"
-				class="md:hidden"
-				onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
-				aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
-			>
-				{#if mobileMenuOpen}
-					<X class="h-5 w-5" />
-				{:else}
-					<Menu class="h-5 w-5" />
-				{/if}
-			</Button>
+			<!-- Theme Switcher + Mobile Menu Button -->
+			<div class="flex items-center gap-1">
+				<ThemeSwitcher />
+
+				<Button
+					variant="ghost"
+					size="icon"
+					class="md:hidden"
+					onclick={() => (mobileMenuOpen = !mobileMenuOpen)}
+					aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+				>
+					{#if mobileMenuOpen}
+						<X class="h-5 w-5" />
+					{:else}
+						<Menu class="h-5 w-5" />
+					{/if}
+				</Button>
+			</div>
 		</div>
 
 		<!-- Mobile Navigation -->

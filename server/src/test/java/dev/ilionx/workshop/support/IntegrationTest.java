@@ -81,10 +81,14 @@ public abstract class IntegrationTest extends WebMvcConfigurator {
     }
 
     protected Pet aSavedPet(final Owner owner) {
+        return aSavedPet(owner, PET_NAME);
+    }
+
+    protected Pet aSavedPet(final Owner owner, final String name) {
         final PetType petType = petTypeRepository.findById(1)
             .orElseThrow(() -> new RuntimeException("Pet type with ID 1 not found in seed data"));
         final Pet pet = new Pet();
-        pet.setName(PET_NAME);
+        pet.setName(name);
         pet.setBirthDate(PET_BIRTH_DATE);
         pet.setType(petType);
         pet.setOwner(owner);

@@ -126,6 +126,20 @@ public class PetService {
     }
 
     /**
+     * Finds pets by name, or all pets if no filter provided.
+     *
+     * @param name optional name filter (case-insensitive, matches anywhere in the name)
+     * @return list of matching pets
+     */
+    @Transactional(readOnly = true)
+    public List<Pet> findByName(final String name) {
+        if (name == null || name.isBlank()) {
+            return findAll();
+        }
+        return petRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    /**
      * Deletes a pet by its unique identifier.
      *
      * @param petId the pet's unique identifier

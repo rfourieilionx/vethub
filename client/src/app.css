@@ -2,11 +2,18 @@
 
 /*
  * ilionx Paws - ilionx Brand Design System
- * Light mode only - clean, professional veterinary clinic feel
+ * Three themes: Light (brand default), Dark, and Pawsome ("fancy").
  * Primary: ilionx Red (#E8003D)
  * Typography: Poppins (body - prefer lighter weights), JetBrains Mono (code)
  * Brand values: Helder (clear), Menselijk (human), Kwalitatief (quality)
+ *
+ * Theming: every theme is a [data-theme='...'] override block below that
+ * restates only the tokens that differ from :root (Light). Components must
+ * never branch on theme directly - they consume tokens (bg-card, text-foreground)
+ * and get themed for free. Bind [data-theme='dark'] to Tailwind's `dark:` variant
+ * so it tracks the selected theme instead of the OS's prefers-color-scheme.
  */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 :root {
   /* Border Radius */
@@ -73,6 +80,93 @@
   --sidebar-accent-foreground: hsl(0 0% 25%);
   --sidebar-border: hsl(0 0% 88%);
   --sidebar-ring: hsl(344 100% 45%);
+
+  /* Theming tokens - things that must be able to move per-theme */
+  --card-border-width: 1px;
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --font-display: var(--font-sans);
+  --app-background-image: none;
+  --hero-gradient-from: #f9fafb;
+  --hero-gradient-to: #f3f4f6;
+}
+
+/* ---------------------------- Dark theme ---------------------------- */
+[data-theme='dark'] {
+  --background: hsl(0 0% 9%);
+  --foreground: hsl(0 0% 92%);
+
+  --card: hsl(0 0% 13%);
+  --card-foreground: hsl(0 0% 92%);
+
+  --popover: hsl(0 0% 13%);
+  --popover-foreground: hsl(0 0% 92%);
+
+  --primary: hsl(344 90% 46%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --secondary: hsl(0 0% 18%);
+  --secondary-foreground: hsl(0 0% 92%);
+
+  --muted: hsl(0 0% 18%);
+  --muted-foreground: hsl(0 0% 65%);
+
+  --accent: hsl(175 60% 30%);
+  --accent-foreground: hsl(0 0% 100%);
+
+  --border: hsl(0 0% 24%);
+  --input: hsl(0 0% 24%);
+  --ring: hsl(344 90% 46%);
+
+  --sidebar: hsl(0 0% 13%);
+  --sidebar-foreground: hsl(0 0% 92%);
+  --sidebar-primary: hsl(344 90% 46%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(0 0% 18%);
+  --sidebar-accent-foreground: hsl(0 0% 92%);
+  --sidebar-border: hsl(0 0% 24%);
+  --sidebar-ring: hsl(344 90% 46%);
+
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+  --app-background-image: none;
+
+  --hero-gradient-from: hsl(0 0% 13%);
+  --hero-gradient-to: hsl(0 0% 9%);
+}
+
+/* --------------------------- Pawsome theme --------------------------- */
+[data-theme='fancy'] {
+  --radius: 1.25rem;
+  --card-border-width: 2px;
+
+  --foreground: hsl(285 35% 22%);
+  --card-foreground: hsl(285 35% 22%);
+  --popover-foreground: hsl(285 35% 22%);
+
+  --primary: hsl(330 85% 46%);
+  --primary-foreground: hsl(0 0% 100%);
+
+  --accent: hsl(190 85% 30%);
+  --accent-foreground: hsl(0 0% 100%);
+
+  --border: hsl(330 60% 88%);
+  --input: hsl(330 60% 88%);
+  --ring: hsl(330 85% 46%);
+
+  --shadow-card: 0 8px 20px -8px hsl(330 85% 46% / 0.35);
+  --shadow-card-hover: 0 14px 28px -10px hsl(330 85% 46% / 0.45);
+
+  --font-display: 'Baloo 2', var(--font-sans);
+  --app-background-image: linear-gradient(
+    160deg,
+    hsl(30 100% 97%) 0%,
+    hsl(320 100% 97%) 45%,
+    hsl(265 100% 97%) 100%
+  );
+
+  --hero-gradient-from: hsl(30 100% 95%);
+  --hero-gradient-to: hsl(320 100% 95%);
 }
 
 /* Tailwind Theme Integration */
@@ -139,6 +233,10 @@
     font-weight: 300; /* Light weight as brand default */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
   }
 
   h1 {
@@ -226,20 +324,20 @@
 .card {
   background-color: var(--card);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border: var(--card-border-width) solid var(--border);
+  box-shadow: var(--shadow-card);
 }
 
 .card-hover {
   background-color: var(--card);
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  border: var(--card-border-width) solid var(--border);
+  box-shadow: var(--shadow-card);
   transition: box-shadow 0.15s ease-in-out;
 }
 
 .card-hover:hover {
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* Button Variants - Using plain CSS */
@@ -373,6 +471,14 @@
 .badge-muted {
   background-color: var(--muted);
   color: var(--muted-foreground);
+}
+
+/* App Shell - background color plus optional per-theme background image (e.g. Pawsome's gradient) */
+.app-shell {
+  background-color: var(--background);
+  background-image: var(--app-background-image);
+  background-attachment: fixed;
+  background-size: cover;
 }
 
 /* Stagger Animation Delays */

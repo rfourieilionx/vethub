@@ -38,6 +38,7 @@ owner/
 
 ## Key patterns & conventions
 
+- **Theming**: `client/src/app.css` defines the Light palette on `:root` and two override blocks, `[data-theme='dark']` and `[data-theme='fancy']` — each restates only the tokens that differ, never duplicates the whole palette. Components must consume tokens (`bg-card`, `text-foreground`), never branch on theme directly. The active theme is set as `data-theme` on `<html>` by an inline bootstrap script in `app.html` (reads `localStorage['vethub:theme']`, falls back to `prefers-color-scheme`) — this runs before hydration to avoid a flash of the wrong theme. `@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *))` in `app.css` is required — without it, Tailwind v4's `dark:` utilities default to `prefers-color-scheme` and ignore the selected theme entirely. When adding a new themeable value (a color, shadow, gradient, etc.), add the token to `:root` first, then override it only in the theme blocks where it actually differs — check whether it needs a value in *every* block, since a token defined in `fancy` but forgotten in `dark` silently falls back to the `:root` (Light) value.
 - **DTOs**: separate `CreateXRequest` / `UpdateXRequest` / `XResponse` classes per domain — entities are never returned directly from controllers.
 - **Mapping is asymmetric**: MapStruct (`@Mapper(config = SharedMapperConfig.class)`, config supplied by the internal `jframe` library, not this repo) only maps entity → response. Request → entity is done by hand, field-by-field, inside the `Service`'s `create`/`update` methods. Don't try to add a MapStruct method for request→entity — that's not the pattern here.
 - **Validation**: custom `Validator` components (e.g. `OwnerValidator`), not Jakarta Bean Validation annotations on the entity or DTOs. Controllers call `xValidator.validateAndThrow(request)` explicitly as the first line of every mutating endpoint.
@@ -61,6 +62,14 @@ Example — adding `email` to `Owner`, in order:
 6. `OwnerMapper` — usually nothing to do; MapStruct maps matching field names automatically. Only add an explicit `@Mapping` if the name or shape differs.
 7. `OwnerService.create`/`update` — add the manual field copy (mapping is asymmetric, see above).
 8. `client/`: run `bun run sync:api` to regenerate `api.d.ts`, then update whatever form/display components need the new field.
+
+## Story workflow
+
+Feature work is tracked as files, not tickets:
+
+- **Refining** a vague request: use the `refinement-agent` subagent (`.claude/agents/refinement-agent.md`). It researches the codebase, drafts a story with an ASCII wireframe and explicit decision points, and — once its draft is confirmed — writes it to `.claude/refined/<kebab-case-title>.md`.
+- **Building** a refined story: pick it up from `.claude/refined/`, implement it, verify it (tests, type checks, and a manual pass if it's UI-facing).
+- **Completing** a story: once a build from `.claude/refined/` is verified working, move that story's file to `.claude/completed/<same-filename>.md` (`git mv` if already committed, plain `mv` otherwise) and append a row to `.claude/CHANGELOG.md`: `| YYYY-MM-DD | <feature name> | <one-line summary> |`. Do this directly — it's simple file housekeeping, not something that needs its own agent invocation.
 
 ## Commands
 
