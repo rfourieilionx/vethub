@@ -1,6 +1,7 @@
 package dev.ilionx.workshop.api.visit.model;
 
 import dev.ilionx.workshop.api.pet.model.Pet;
+import dev.ilionx.workshop.api.vet.model.Vet;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,8 +36,7 @@ public class Visit {
     )
     private LocalDate date;
 
-    // BUG: No @NotBlank validation - blank descriptions are allowed
-    // Students should add @NotBlank
+    // Validated by VisitValidator, not Bean Validation annotations - see AGENTS.md.
     @Column(name = "description")
     private String description;
 
@@ -46,5 +46,12 @@ public class Visit {
         nullable = false
     )
     private Pet pet;
+
+    // Nullable: historical visits may have no attending vet on record, and
+    // deleting a vet sets this to null (ON DELETE SET NULL) rather than
+    // destroying the visit.
+    @ManyToOne
+    @JoinColumn(name = "vet_id")
+    private Vet vet;
 
 }

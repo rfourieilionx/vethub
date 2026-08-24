@@ -9,6 +9,7 @@ import dev.ilionx.workshop.api.pet.model.request.CreatePetRequest;
 import dev.ilionx.workshop.api.pet.model.request.CreatePetTypeRequest;
 import dev.ilionx.workshop.api.pet.model.request.UpdatePetRequest;
 import dev.ilionx.workshop.api.pet.model.request.UpdatePetTypeRequest;
+import dev.ilionx.workshop.api.vet.model.Vet;
 import dev.ilionx.workshop.api.vet.model.request.CreateSpecialtyRequest;
 import dev.ilionx.workshop.api.vet.model.request.CreateVetRequest;
 import dev.ilionx.workshop.api.vet.model.request.UpdateSpecialtyRequest;
@@ -38,6 +39,9 @@ public abstract class IntegrationTest extends WebMvcConfigurator {
 
     private static final String VISIT_DESCRIPTION = "Rabies shot";
     private static final LocalDate VISIT_DATE = LocalDate.of(2023, 1, 1);
+
+    private static final String VET_FIRST_NAME = "Alice";
+    private static final String VET_LAST_NAME = "Brown";
 
     // ========================= LIFECYCLE =========================
     @BeforeEach
@@ -96,11 +100,23 @@ public abstract class IntegrationTest extends WebMvcConfigurator {
     }
 
     protected Visit aSavedVisit(final Pet pet) {
+        return aSavedVisit(pet, null);
+    }
+
+    protected Visit aSavedVisit(final Pet pet, final Vet vet) {
         final Visit visit = new Visit();
         visit.setDate(VISIT_DATE);
         visit.setDescription(VISIT_DESCRIPTION);
         visit.setPet(pet);
+        visit.setVet(vet);
         return visitRepository.save(visit);
+    }
+
+    protected Vet aSavedVet() {
+        final Vet vet = new Vet();
+        vet.setFirstName(VET_FIRST_NAME);
+        vet.setLastName(VET_LAST_NAME);
+        return vetRepository.save(vet);
     }
 
     // ========================= REQUEST FACTORIES =========================
@@ -163,15 +179,16 @@ public abstract class IntegrationTest extends WebMvcConfigurator {
     }
 
     // -- Visit --
-    protected static CreateVisitRequest aCreateVisitRequest() {
+    protected static CreateVisitRequest aCreateVisitRequest(final Integer vetId) {
         final CreateVisitRequest request = new CreateVisitRequest();
         request.setDate(LocalDate.of(2023, 1, 1));
         request.setDescription("Rabies shot");
+        request.setVetId(vetId);
         return request;
     }
 
-    protected static CreateVisitRequest aCreateVisitRequestWithPet(final Integer petId) {
-        final CreateVisitRequest request = aCreateVisitRequest();
+    protected static CreateVisitRequest aCreateVisitRequestWithPet(final Integer petId, final Integer vetId) {
+        final CreateVisitRequest request = aCreateVisitRequest(vetId);
         request.setPetId(petId);
         return request;
     }
@@ -180,6 +197,12 @@ public abstract class IntegrationTest extends WebMvcConfigurator {
         final UpdateVisitRequest request = new UpdateVisitRequest();
         request.setDate(LocalDate.of(2023, 6, 15));
         request.setDescription("Follow-up checkup");
+        return request;
+    }
+
+    protected static UpdateVisitRequest anUpdateVisitRequest(final Integer vetId) {
+        final UpdateVisitRequest request = anUpdateVisitRequest();
+        request.setVetId(vetId);
         return request;
     }
 

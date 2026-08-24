@@ -37,5 +37,17 @@ public abstract class PetMapper {
 
     public abstract PetTypeResponse toPetTypeResponse(PetType petType);
 
+    @Mapping(
+        source = "vet.id",
+        target = "vetId"
+    )
+    @Mapping(
+        source = "vet.firstName",
+        target = "vetFirstName"
+    )
+    @Mapping(
+        source = "vet.lastName",
+        target = "vetLastName"
+    )
     public abstract VisitSummaryResponse toVisitSummaryResponse(Visit visit);
 }

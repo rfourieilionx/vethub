@@ -38,4 +38,13 @@ public class VisitSummaryResponse {
         requiredMode = Schema.RequiredMode.REQUIRED
     )
     private String description;
+
+    @Schema(description = "The attending vet's unique identifier, absent if not recorded")
+    private Integer vetId;
+
+    @Schema(description = "The attending vet's first name, absent if not recorded")
+    private String vetFirstName;
+
+    @Schema(description = "The attending vet's last name, absent if not recorded")
+    private String vetLastName;
 }

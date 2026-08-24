@@ -6,6 +6,7 @@ import dev.ilionx.workshop.api.visit.model.mapper.VisitMapper;
 import dev.ilionx.workshop.api.visit.model.request.CreateVisitRequest;
 import dev.ilionx.workshop.api.visit.model.request.UpdateVisitRequest;
 import dev.ilionx.workshop.api.visit.model.response.VisitResponse;
+import dev.ilionx.workshop.api.visit.model.validator.VisitValidator;
 import dev.ilionx.workshop.api.visit.service.VisitService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static dev.ilionx.workshop.api.Paths.OWNER_VISITS;
 import static dev.ilionx.workshop.api.Paths.PET_VISITS;
 import static dev.ilionx.workshop.api.Paths.PET_VISIT_BY_ID;
 import static org.springframework.http.HttpStatus.CREATED;
@@ -37,6 +39,7 @@ public class VisitController {
     private final VisitService visitService;
     private final PetService petService;
     private final VisitMapper visitMapper;
+    private final VisitValidator visitValidator;
 
     @ResponseStatus(OK)
     @Operation(
@@ -56,6 +59,20 @@ public class VisitController {
         return ResponseEntity.status(OK).body(visitMapper.toResponseList(visits));
     }
 
+    @ResponseStatus(OK)
+    @Operation(
+        summary = "Get visits by owner",
+        description = "Returns all visits across every pet belonging to a specific owner, most recent first"
+    )
+    @GetMapping(
+        path = OWNER_VISITS,
+        produces = APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<List<VisitResponse>> getVisitsByOwner(@PathVariable final Integer ownerId) {
+        final List<Visit> visits = visitService.findByOwnerId(ownerId);
+        return ResponseEntity.status(OK).body(visitMapper.toResponseList(visits));
+    }
+
     @ResponseStatus(CREATED)
     @Operation(
         summary = "Create visit",
@@ -71,6 +88,7 @@ public class VisitController {
         @PathVariable final Integer petId,
         @RequestBody final CreateVisitRequest request
     ) {
+        visitValidator.validateAndThrow(request);
         petService.findByIdAndOwnerId(petId, ownerId);
         final Visit createdVisit = visitService.create(petId, request);
         return ResponseEntity.status(CREATED).body(visitMapper.toResponse(createdVisit));
@@ -111,6 +129,7 @@ public class VisitController {
         @PathVariable final Integer visitId,
         @RequestBody final UpdateVisitRequest request
     ) {
+        visitValidator.validateAndThrow(request);
         petService.findByIdAndOwnerId(petId, ownerId);
         final Visit visit = visitService.update(visitId, request);
         return ResponseEntity.status(OK).body(visitMapper.toResponse(visit));
