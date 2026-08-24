@@ -15,7 +15,7 @@ Two main components, talking over REST/JSON:
 ```mermaid
 flowchart LR
     subgraph Client["client/ (SvelteKit, :5173)"]
-        UI["Routes & components<br/>owners · vets · visits"]
+        UI["Routes & components<br/>owners · pets · vets · visits"]
         API["openapi-fetch client<br/>lib/api/client.ts"]
         Types["Generated types<br/>lib/types/api.d.ts"]
         UI --> API
@@ -47,7 +47,7 @@ flowchart LR
 
 ### `client/` — SvelteKit 2 / Svelte 5, TypeScript, Tailwind, built with bun/Vite
 
-- Routes mirror the domain: `routes/owners`, `routes/vets`, `routes/visits`, each with list/detail/new pages, backed by feature-scoped components (`lib/components/owners`, `lib/components/vets`, `lib/components/pets`).
+- Routes mirror the domain: `routes/owners`, `routes/pets`, `routes/vets`, `routes/visits`, each with list/detail/new pages, backed by feature-scoped components (`lib/components/owners`, `lib/components/pets`, `lib/components/vets`, `lib/components/layout`).
 - **API client**: `lib/api/client.ts` uses `openapi-fetch`, a type-safe fetch wrapper generated against the backend's live OpenAPI spec (`lib/types/api.d.ts`), so the frontend gets compile-time-checked request/response shapes instead of hand-written interfaces.
 
 ### How they communicate
@@ -163,8 +163,9 @@ Verify it's running:
 |---|---|---|
 | Swagger UI | http://localhost:8080/api/v1/public/docs/swagger-ui/index.html | API documentation page |
 | Owners API | http://localhost:8080/api/v1/owners | JSON array of owners |
-| Vets API | http://localhost:8080/api/v1/vets | JSON array of vets |
 | Pets API | http://localhost:8080/api/v1/pets | JSON array of pets |
+| Vets API | http://localhost:8080/api/v1/vets | JSON array of vets |
+| Visits API | http://localhost:8080/api/v1/visits | JSON array of visits |
 
 The H2 database seeds itself automatically on startup with sample owners, pets, vets, specialties, and visits.
 
@@ -180,7 +181,7 @@ bun run dev
 
 > The repo is set up for **bun** (`bun.lock`, and `bun` is what's pinned in `mise.toml`) — use `bun`, not `npm`, so installs stay consistent with the lockfile.
 
-Also runs in the foreground. Open [http://localhost:5173](http://localhost:5173) — you should see the VetHub dashboard with nav links to **Owners**, **Veterinarians**, and **Visits**. Click through each to confirm they load data from the backend.
+Also runs in the foreground. Open [http://localhost:5173](http://localhost:5173) — you should see the VetHub dashboard with nav links to **Owners**, **Pets**, **Veterinarians**, and **Visits** (plus a theme switcher in the header — Light/Dark/Pawsome). Click through each to confirm they load data from the backend.
 
 ### 5. IDE setup
 
@@ -215,7 +216,7 @@ and pick a provider:
 Before the workshop, confirm all three:
 
 1. **Backend responds to API requests** — the Step 3 table above all return real data.
-2. **Frontend displays the VetHub dashboard** — `localhost:5173` loads with working Owners/Vets/Visits pages.
+2. **Frontend displays the VetHub dashboard** — `localhost:5173` loads with working Owners/Pets/Vets/Visits pages.
 3. **OpenCode is connected to a model**:
    ```bash
    opencode auth list
@@ -244,6 +245,10 @@ scripts/  Dev utility scripts (see below)
 | Check frontend types | `cd client && bun run check` |
 
 `sync:api` runs [`scripts/openapi-sync.sh`](scripts/openapi-sync.sh): starts the backend, fetches the OpenAPI spec, regenerates TypeScript types into `client/src/lib/types/api.d.ts`, then stops the backend again.
+
+## Continuous Integration
+
+[`.github/workflows/backend-tests.yml`](.github/workflows/backend-tests.yml) runs `./gradlew test` on every push to `main` or a `workshop/*` branch, and on pull requests targeting `main`. Test reports are uploaded as a build artifact on each run, so a failure is inspectable from the Actions tab, not just a red X.
 
 ## Troubleshooting
 

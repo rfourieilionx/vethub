@@ -82,3 +82,7 @@ Feature work is tracked as files, not tickets:
 | Format code | `cd server && ./gradlew spotlessApply` |
 | Regenerate API types | `cd client && bun run sync:api` |
 | Check frontend types | `cd client && bun run check` |
+
+## CI
+
+`.github/workflows/backend-tests.yml` runs the backend test suite on every push to `main`/`workshop/*` and on PRs into `main`. There is no frontend CI job yet (`bun run check`/`build` aren't wired in) — worth adding if the frontend starts carrying real logic beyond thin API wrappers.
