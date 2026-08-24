@@ -118,7 +118,9 @@
 										</Badge>
 									{/each}
 									{#if !vet.specialties?.length}
-										<span class="text-sm text-muted-foreground">General Practice</span>
+										<Badge variant="outline" class="text-xs">
+											General Practice
+										</Badge>
 									{/if}
 								</div>
 							</Table.Cell>

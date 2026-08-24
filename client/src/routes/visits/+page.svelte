@@ -6,7 +6,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import * as Table from '$lib/components/ui/table';
 	import * as Select from '$lib/components/ui/select';
-	import { Calendar, Search, Loader2, ExternalLink } from 'lucide-svelte';
+	import { Calendar, Search, Loader2, ExternalLink, Plus } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 
 	let visits = $state<VisitResponse[]>([]);
@@ -62,14 +62,20 @@
 
 <div class="container mx-auto px-4 py-8">
 	<!-- Header -->
-	<div class="mb-8">
-		<div class="flex items-center gap-3 mb-2">
-			<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-				<Calendar class="h-5 w-5 text-primary" />
+	<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+		<div>
+			<div class="flex items-center gap-3 mb-2">
+				<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+					<Calendar class="h-5 w-5 text-primary" />
+				</div>
+				<h1 class="text-3xl font-bold text-foreground">Visits</h1>
 			</div>
-			<h1 class="text-3xl font-bold text-foreground">Visits</h1>
+			<p class="text-muted-foreground">View all veterinary visits across all pets</p>
 		</div>
-		<p class="text-muted-foreground">View all veterinary visits across all pets</p>
+		<Button href="/visits/new" class="gap-2">
+			<Plus class="h-4 w-4" />
+			Schedule Visit
+		</Button>
 	</div>
 
 	<!-- Search & Filter -->
