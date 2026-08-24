@@ -49,6 +49,7 @@ owner/
 - **Frontend API access**: one `openapi-fetch` client instance (`client/src/lib/api/client.ts`) → thin per-domain wrapper functions (`client/src/lib/api/owner/OwnerController.ts`) → Svelte components call those wrappers directly inside `$effect`. There are **no SvelteKit `load` functions** in this app — data fetching is client-side only, not SSR.
 - **Package manager**: use `bun`, not `npm`, in `client/` — the repo ships `bun.lock` and `mise.toml` pins `bun`. `npm install` will work but drifts from the lockfile.
 - **Security posture**: CORS + HTTP Basic auth are configured (`WebSecurityConfig`), but `anyRequest().permitAll()` means nothing is actually enforced yet. This is a deliberate starting state for the workshop — don't "fix" it unless a task explicitly asks for it.
+- **Ordered collections**: a `@OneToMany` with no `@OrderBy` comes back in whatever order the database feels like (usually insertion/PK order, not guaranteed). If a list needs a specific order (e.g. a pet's visits, newest first), add `@OrderBy("date DESC")` on the entity side — don't compensate with a `.sort()` in a Svelte template, that's a symptom of missing server-side ordering, not a frontend concern.
 
 ## Common task: adding a field to an entity
 
