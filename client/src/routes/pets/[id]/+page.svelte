@@ -124,7 +124,7 @@
 			</div>
 		{:else}
 			<div class="space-y-4">
-				{#each pet.visits.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) as visit (visit.id)}
+				{#each pet.visits as visit (visit.id)}
 					<Card.Root>
 						<Card.Content class="pt-6">
 							<div class="flex items-start gap-4">
@@ -134,6 +134,13 @@
 								<div>
 									<p class="font-medium text-foreground">{visit.description}</p>
 									<p class="text-sm text-muted-foreground">{formatDate(visit.date)}</p>
+									<p class="text-sm text-muted-foreground">
+										{#if visit.vetFirstName}
+											Seen by Dr. {visit.vetFirstName} {visit.vetLastName}
+										{:else}
+											Seen by — not recorded
+										{/if}
+									</p>
 								</div>
 							</div>
 						</Card.Content>

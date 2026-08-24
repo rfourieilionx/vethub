@@ -2,7 +2,8 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { getOwnerById, deleteOwner as deleteOwnerApi } from '$lib/api/owner/OwnerController';
-	import type { OwnerResponse, PetSummaryResponse } from '$lib/api/models';
+	import { getVisitsByOwner } from '$lib/api/visit/VisitController';
+	import type { OwnerResponse, PetSummaryResponse, VisitResponse } from '$lib/api/models';
 	import { Button } from '$lib/components/ui/button';
 	import { Badge } from '$lib/components/ui/badge';
 	import * as Card from '$lib/components/ui/card';
@@ -12,6 +13,7 @@
 		MapPin,
 		PawPrint,
 		Calendar,
+		Stethoscope,
 		ArrowLeft,
 		Pencil,
 		Trash2,
@@ -20,7 +22,9 @@
 	import { toast } from 'svelte-sonner';
 
 	let owner = $state<OwnerResponse | null>(null);
+	let visits = $state<VisitResponse[]>([]);
 	let loading = $state(true);
+	let visitsLoading = $state(true);
 	let deleting = $state(false);
 
 	const ownerId = $derived(Number($page.params.id));
@@ -34,6 +38,18 @@
 			console.error('Error loading owner:', err);
 		} finally {
 			loading = false;
+		}
+	}
+
+	async function loadVisits() {
+		visitsLoading = true;
+		try {
+			visits = await getVisitsByOwner(ownerId);
+		} catch (err) {
+			toast.error('Failed to load visit history');
+			console.error('Error loading visits:', err);
+		} finally {
+			visitsLoading = false;
 		}
 	}
 
@@ -72,10 +88,11 @@
 		return years === 1 ? '1 year old' : `${years} years old`;
 	}
 
-	// Load owner on mount
+	// Load owner and their visit history on mount
 	$effect(() => {
 		if (ownerId) {
 			loadOwner();
+			loadVisits();
 		}
 	});
 </script>
@@ -194,6 +211,58 @@
 								View Details
 							</Button>
 						</Card.Footer>
+					</Card.Root>
+				{/each}
+			</div>
+		{/if}
+
+		<!-- Visit History Section -->
+		<div class="mb-6 mt-10 flex items-center justify-between">
+			<h2 class="text-xl font-semibold text-foreground">Visit History</h2>
+			<span class="text-sm text-muted-foreground">across all of this owner's pets</span>
+		</div>
+
+		{#if visitsLoading}
+			<div class="card p-8 text-center">
+				<div class="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+				<p class="text-muted-foreground">Loading visits...</p>
+			</div>
+		{:else if !visits.length}
+			<div class="card p-8 text-center">
+				<Stethoscope class="mx-auto mb-4 h-12 w-12 text-muted-foreground/50" />
+				<p class="text-muted-foreground">No visits recorded yet</p>
+			</div>
+		{:else}
+			<div class="space-y-4">
+				{#each visits as visit (visit.id)}
+					<Card.Root>
+						<Card.Content class="pt-6">
+							<div class="flex items-start justify-between gap-4">
+								<div class="flex items-start gap-4">
+									<div class="flex h-10 w-10 items-center justify-center rounded-full bg-success/10">
+										<Stethoscope class="h-5 w-5 text-success" />
+									</div>
+									<div>
+										<div class="flex flex-wrap items-center gap-2">
+											<p class="font-medium text-foreground">{visit.description}</p>
+											<a href="/owners/{ownerId}/pets/{visit.petId}">
+												<Badge variant="secondary">{visit.petName}</Badge>
+											</a>
+										</div>
+										<p class="text-sm text-muted-foreground">
+											{#if visit.vetFirstName}
+												Seen by Dr. {visit.vetFirstName} {visit.vetLastName}
+											{:else}
+												Seen by — not recorded
+											{/if}
+										</p>
+									</div>
+								</div>
+								<span class="whitespace-nowrap text-sm text-muted-foreground">
+									{formatDate(visit.date)}
+								</span>
+							</div>
+						</Card.Content>
 					</Card.Root>
 				{/each}
 			</div>

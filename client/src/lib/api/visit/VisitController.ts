@@ -44,6 +44,17 @@ export async function getVisitsByPet(ownerId: number, petId: number): Promise<Vi
 }
 
 /**
+ * Get all visits across every pet belonging to an owner, most recent first
+ */
+export async function getVisitsByOwner(ownerId: number): Promise<VisitResponse[]> {
+	const { data, error } = await client.GET('/v1/owners/{ownerId}/visits', {
+		params: { path: { ownerId } }
+	});
+	if (error) throw error;
+	return data ?? [];
+}
+
+/**
  * Create a new visit
  */
 export async function createVisit(request: CreateVisitRequest): Promise<VisitResponse> {
